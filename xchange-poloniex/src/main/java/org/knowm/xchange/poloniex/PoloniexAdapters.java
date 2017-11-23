@@ -140,12 +140,12 @@ public class PoloniexAdapters {
       for (PoloniexLoan poloniexLoan : item.getValue()) {
         Date date = PoloniexUtils.stringToDate(poloniexLoan.getDate());
         loanOrders.add(new FixedRateLoanOrder(OrderType.ASK, poloniexLoan.getCurrency(), poloniexLoan.getAmount(), poloniexLoan.getRange(),
-            poloniexLoan.getId(), date, poloniexLoan.getRate())); //TODO
+            poloniexLoan.getId(), date, poloniexLoan.getRate(), poloniexLoan.getFees())); //TODO
       }
       loans.put(item.getKey(), loanOrders);
     }
 
-    return new LoanInfo(loans.get("provided"), loans.get("used"));
+    return new LoanInfo(loans.get("provided"), loans.get("used"), loans.get("opened"));
   }
 
   public static OpenOrders adaptPoloniexOpenOrders(Map<String, PoloniexOpenOrder[]> poloniexOpenOrders) {

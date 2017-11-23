@@ -42,6 +42,11 @@ public class LoanOrder implements Serializable {
   private final Date timestamp;
 
   /**
+   * The fees attached to the loan, null if not active
+   */
+  private final BigDecimal fees;
+
+  /**
    * Constructor
    *
    * @param type Order type i.e. bid or ask
@@ -50,8 +55,9 @@ public class LoanOrder implements Serializable {
    * @param dayPeriod Duration of loan in days
    * @param id An identifier that uniquely identifies the order
    * @param timestamp The timestamp on the order according to the exchange's server, null if not provided
+   * @param fees The fees attached to the loan, null if not active
    */
-  public LoanOrder(OrderType type, String currency, BigDecimal originalAmount, int dayPeriod, String id, Date timestamp) {
+  public LoanOrder(OrderType type, String currency, BigDecimal originalAmount, int dayPeriod, String id, Date timestamp, BigDecimal fees) {
 
     this.type = type;
     this.currency = currency;
@@ -59,6 +65,7 @@ public class LoanOrder implements Serializable {
     this.dayPeriod = dayPeriod;
     this.id = id;
     this.timestamp = timestamp;
+    this.fees = fees;
   }
 
   public OrderType getType() {
@@ -91,11 +98,16 @@ public class LoanOrder implements Serializable {
     return timestamp;
   }
 
+  public BigDecimal getFees() {
+
+    return fees;
+  }
+
   @Override
   public String toString() {
 
     return "LoanOrder [type=" + type + ", currency=" + currency + ", originalAmount=" + originalAmount + ", dayPeriod=" + dayPeriod + ", id=" + id
-        + ", timestamp=" + timestamp + "]";
+        + ", timestamp=" + timestamp +" , fees=" + fees + "]";
   }
 
   @Override
@@ -109,6 +121,7 @@ public class LoanOrder implements Serializable {
     result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
     result = prime * result + ((originalAmount == null) ? 0 : originalAmount.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((fees == null) ? 0 : fees.hashCode());
     return result;
   }
 

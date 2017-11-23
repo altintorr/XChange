@@ -25,9 +25,9 @@ public final class FloatingRateLoanOrder extends LoanOrder implements Comparable
    * @param timestamp The absolute time for this order
    */
   public FloatingRateLoanOrder(Order.OrderType type, String currency, BigDecimal originalAmount, int dayPeriod, String id, Date timestamp,
-      BigDecimal rate) {
+      BigDecimal rate, BigDecimal fees) {
 
-    super(type, currency, originalAmount, dayPeriod, id, timestamp);
+    super(type, currency, originalAmount, dayPeriod, id, timestamp, fees);
     this.rate = rate;
   }
 

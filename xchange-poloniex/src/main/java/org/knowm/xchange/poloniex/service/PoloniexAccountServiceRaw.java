@@ -2,9 +2,11 @@ package org.knowm.xchange.poloniex.service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -60,8 +62,22 @@ public class PoloniexAccountServiceRaw extends PoloniexBaseService {
   public LoanInfo getLoanInfo() throws IOException {
     try {
       HashMap<String, PoloniexLoan[]> response = poloniexAuthenticated.returnActiveLoans(apiKey, signatureCreator, exchange.getNonceFactory());
-      return PoloniexAdapters.adaptPoloniexLoans(response);
-    } catch (PoloniexException e) {
+      HashMap<String, PoloniexLoan[]> response2 = poloniexAuthenticated.returnOpenLoanOffers(apiKey, signatureCreator, exchange.getNonceFactory());
+      if(response2 != null) {
+        ArrayList<PoloniexLoan> poloniexLoans = new ArrayList<PoloniexLoan>();
+        for (Map.Entry<String, PoloniexLoan[]> entry : response2.entrySet()) {
+          for (PoloniexLoan pl : entry.getValue()) {
+            pl.setCurrency(entry.getKey());
+            poloniexLoans.add(pl);
+          }
+        }
+        PoloniexLoan[] pltmp = new PoloniexLoan[poloniexLoans.size()];
+        response.put("opened", poloniexLoans.toArray(pltmp));
+      }
+      else {
+        response.put("opened",new PoloniexLoan[0]);
+      }
+      return PoloniexAdapters.adaptPoloniexLoans(response);    } catch (PoloniexException e) {
       throw new ExchangeException(e.getError(), e);
     }
   }

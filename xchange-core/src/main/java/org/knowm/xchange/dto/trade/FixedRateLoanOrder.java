@@ -28,9 +28,9 @@ public final class FixedRateLoanOrder extends LoanOrder implements Comparable<Fi
    * @param timestamp The absolute time for this order
    * @param rate The fixed rate of return for a day
    */
-  public FixedRateLoanOrder(OrderType type, String currency, BigDecimal originalAmount, int dayPeriod, String id, Date timestamp, BigDecimal rate) {
+  public FixedRateLoanOrder(OrderType type, String currency, BigDecimal originalAmount, int dayPeriod, String id, Date timestamp, BigDecimal rate, BigDecimal fees) {
 
-    super(type, currency, originalAmount, dayPeriod, id, timestamp);
+    super(type, currency, originalAmount, dayPeriod, id, timestamp, fees);
 
     this.rate = rate;
   }
