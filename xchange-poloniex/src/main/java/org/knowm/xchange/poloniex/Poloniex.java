@@ -10,9 +10,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.knowm.xchange.poloniex.dto.account.PoloniexLoan;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexChartData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexCurrencyInfo;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexDepth;
+import org.knowm.xchange.poloniex.dto.marketdata.PoloniexLoanMarketData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexMarketData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexPublicTrade;
 
@@ -44,6 +46,9 @@ public interface Poloniex {
 
   @GET
   PoloniexChartData[] getChartData(@QueryParam("command") String command, @QueryParam("currencyPair") String pair,
-      @QueryParam("start") Long startTime, @QueryParam("end") Long endTime, @QueryParam("period") long period) throws PoloniexException, IOException;
+                                   @QueryParam("start") Long startTime, @QueryParam("end") Long endTime, @QueryParam("period") long period) throws PoloniexException, IOException;
+
+  @GET
+  HashMap<String, PoloniexLoanMarketData[]> getLoanOrders(@QueryParam("command") String command, @QueryParam("currency") String currency) throws PoloniexException, IOException;
 
 }

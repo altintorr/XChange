@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import org.knowm.xchange.Exchange;
 import org.knowm.xchange.currency.Currency;
@@ -17,6 +17,7 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.poloniex.PoloniexAdapters;
 import org.knowm.xchange.poloniex.PoloniexException;
 import org.knowm.xchange.poloniex.dto.LoanInfo;
+import org.knowm.xchange.poloniex.dto.account.PoloniexAccountBalance;
 import org.knowm.xchange.poloniex.dto.account.PoloniexBalance;
 import org.knowm.xchange.poloniex.dto.account.PoloniexLoan;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexDepositsWithdrawalsResponse;
@@ -93,6 +94,24 @@ public class PoloniexAccountServiceRaw extends PoloniexBaseService {
       return response.get(currency);
     } else {
       throw new ExchangeException("Poloniex did not return a deposit address for " + currency);
+    }
+  }
+
+  public HashMap<String,ArrayList<PoloniexAccountBalance>> getAvailableAccountBalances() throws IOException {
+    HashMap<String, HashMap<String,BigDecimal>> response = poloniexAuthenticated.returnAvailableAccountBalances(apiKey, signatureCreator, exchange.getNonceFactory());
+    return PoloniexAdapters.adaptAccountBalance(response);
+  }
+
+  public void transferValue(String currency, String amount, String fromAccount, String toAccount) {
+    try {
+      HashMap<String, String> response = poloniexAuthenticated.transferBalance(apiKey, signatureCreator, exchange.getNonceFactory(),currency, amount,fromAccount,toAccount);
+      int i = 2+2;
+    }
+    catch(PoloniexException e) {
+      throw new PoloniexException(e.getError());
+    }
+    catch(IOException e) {
+      throw new PoloniexException(e.getMessage());
     }
   }
 

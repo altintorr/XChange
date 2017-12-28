@@ -14,6 +14,9 @@ import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.poloniex.PoloniexAuthenticated;
 import org.knowm.xchange.poloniex.PoloniexException;
 import org.knowm.xchange.poloniex.PoloniexUtils;
+import org.knowm.xchange.poloniex.dto.trade.PoloniexLoanCancelResponse;
+import org.knowm.xchange.poloniex.dto.trade.PoloniexLoanCreationResponse;
+import org.knowm.xchange.poloniex.dto.trade.PoloniexLoanOffer;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexMoveResponse;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexOpenOrder;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexOrderFlags;
@@ -60,12 +63,32 @@ public class PoloniexTradeServiceRaw extends PoloniexBaseService {
     return poloniexAuthenticated.returnTradeHistory(apiKey, signatureCreator, exchange.getNonceFactory(), "all", startTime, endTime, ignore);
   }
 
-  public PoloniexTradeResponse buy(LimitOrder limitOrder) throws IOException {
+  public PoloniexTradeResponse buy(LimitOrder limitOrder) throws IOException,ExchangeException {
     return orderEntry(limitOrder, "buy");
   }
 
-  public PoloniexTradeResponse sell(LimitOrder limitOrder) throws IOException {
+  public PoloniexTradeResponse sell(LimitOrder limitOrder) throws IOException,ExchangeException {
     return orderEntry(limitOrder, "sell");
+  }
+
+  public PoloniexLoanCreationResponse placeLoanOffer(PoloniexLoanOffer loanOffer) throws IOException {
+   try {
+     String autoRenew="0";
+      if(loanOffer.getAutorenew()) {
+        autoRenew = "1";
+      }
+      else {
+        autoRenew = "0";
+      }
+      Method loanOfferMethod = PoloniexAuthenticated.class.getDeclaredMethod("createLoanOffer", String.class, ParamsDigest.class, SynchronizedValueFactory.class,
+              String.class, String.class, String.class, String.class, String.class);
+      PoloniexLoanCreationResponse plcr = (PoloniexLoanCreationResponse) loanOfferMethod.invoke(poloniexAuthenticated, apiKey, signatureCreator,
+              exchange.getNonceFactory(), loanOffer.getCurrency(), loanOffer.getAmount().toPlainString(),
+              loanOffer.getDuration().toPlainString(), autoRenew, loanOffer.getRate().toPlainString().replace(",","."));
+      return plcr;
+    } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new ExchangeException(e.getMessage(), e);
+    }
   }
 
   private PoloniexTradeResponse orderEntry(LimitOrder limitOrder, String name) throws IOException {
@@ -112,9 +135,9 @@ public class PoloniexTradeServiceRaw extends PoloniexBaseService {
         return response;
       }
     } catch (PoloniexException e) {
-      throw new ExchangeException(e.getError(), e);
+      throw new PoloniexException(e.getError());
     } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new ExchangeException(e.getMessage(), e);
+      throw new PoloniexException(((InvocationTargetException) e).getTargetException().getMessage());
     }
   }
 
@@ -156,7 +179,17 @@ public class PoloniexTradeServiceRaw extends PoloniexBaseService {
     }
   }
 
-  public HashMap<String, String> getFeeInfo() throws IOException {
+  public boolean cancelLoan(String orderId) throws IOException {
+    PoloniexLoanCancelResponse response = poloniexAuthenticated.cancelLoanOffer(apiKey, signatureCreator, exchange.getNonceFactory(), orderId);
+    if (!response.getSuccess()) {
+      throw new PoloniexException(response.getError());
+    } else {
+      return response.getSuccess();
+    }
+  }
+
+
+    public HashMap<String, String> getFeeInfo() throws IOException {
     HashMap<String, String> response = poloniexAuthenticated.returnFeeInfo(apiKey, signatureCreator, exchange.getNonceFactory());
     if (response.containsKey("error")) {
       throw new ExchangeException(response.get("error"));

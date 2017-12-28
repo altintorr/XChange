@@ -2,7 +2,7 @@ package org.knowm.xchange.service.trade.params;
 
 import java.math.BigDecimal;
 
-import javax.annotation.Nullable;
+import android.support.annotation.Nullable;
 
 import org.knowm.xchange.currency.Currency;
 

@@ -9,9 +9,11 @@ import org.knowm.xchange.currency.CurrencyPair;
 import org.knowm.xchange.exceptions.ExchangeException;
 import org.knowm.xchange.poloniex.PoloniexException;
 import org.knowm.xchange.poloniex.PoloniexUtils;
+import org.knowm.xchange.poloniex.dto.account.PoloniexLoan;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexChartData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexCurrencyInfo;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexDepth;
+import org.knowm.xchange.poloniex.dto.marketdata.PoloniexLoanMarketData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexMarketData;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexPublicTrade;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexTicker;
@@ -172,6 +174,20 @@ public class PoloniexMarketDataServiceRaw extends PoloniexBaseService {
       PoloniexChartData[] chartData = poloniex.getChartData(command, pairString, startTime, endTime, period.getPeriod());
       return chartData;
     } catch (PoloniexException e) {
+      throw new ExchangeException(e.getError(), e);
+    }
+  }
+
+  public HashMap<String, PoloniexLoanMarketData[]> getPoloniexLoans(String currency) throws IOException {
+
+    String command = "returnLoanOrders";
+
+    try {
+      PoloniexLoan[] loans;
+      HashMap<String, PoloniexLoanMarketData[]> response = poloniex.getLoanOrders(command, currency);
+      return response;
+    } catch (PoloniexException e) {
+      e.printStackTrace();
       throw new ExchangeException(e.getError(), e);
     }
   }

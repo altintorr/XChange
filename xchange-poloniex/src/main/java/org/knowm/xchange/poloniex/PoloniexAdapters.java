@@ -29,6 +29,7 @@ import org.knowm.xchange.dto.trade.LimitOrder;
 import org.knowm.xchange.dto.trade.OpenOrders;
 import org.knowm.xchange.dto.trade.UserTrade;
 import org.knowm.xchange.poloniex.dto.LoanInfo;
+import org.knowm.xchange.poloniex.dto.account.PoloniexAccountBalance;
 import org.knowm.xchange.poloniex.dto.account.PoloniexBalance;
 import org.knowm.xchange.poloniex.dto.account.PoloniexLoan;
 import org.knowm.xchange.poloniex.dto.marketdata.PoloniexCurrencyInfo;
@@ -240,5 +241,29 @@ public class PoloniexAdapters {
           w.getAmount(), String.valueOf(w.getWithdrawalNumber()), externalId, WITHDRAWAL, status, null, null, w.getStatus()));
     }
     return fundingRecords;
+  }
+
+  public static HashMap<String,ArrayList<PoloniexAccountBalance>> adaptAccountBalance (HashMap<String, HashMap<String,BigDecimal>> rawAccountBalance){
+    HashMap<String, ArrayList<PoloniexAccountBalance>> accountBalance = new HashMap<String, ArrayList<PoloniexAccountBalance>>();
+    ArrayList<PoloniexAccountBalance> account;
+    for(Map.Entry<String, HashMap<String, BigDecimal>> rawAccount : rawAccountBalance.entrySet()) {
+      account = new ArrayList<>();
+      String key = rawAccount.getKey();
+      HashMap value = rawAccount.getValue();
+      for(Map.Entry<String,BigDecimal> rawBalance :  rawAccount.getValue().entrySet()) {
+        account.add(new PoloniexAccountBalance(rawBalance.getKey(),rawBalance.getValue()));
+      }
+      accountBalance.put(rawAccount.getKey(),account);
+    }
+    if(!accountBalance.containsKey("exchange")){
+      accountBalance.put("exchange",new ArrayList<>());
+    }
+    if(!accountBalance.containsKey("margin")){
+      accountBalance.put("margin",new ArrayList<>());
+    }
+    if(!accountBalance.containsKey("lending")){
+      accountBalance.put("lending",new ArrayList<>());
+    }
+    return accountBalance;
   }
 }

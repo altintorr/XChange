@@ -2,10 +2,11 @@ package org.knowm.xchange.poloniex;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nullable;
+import android.support.annotation.Nullable;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
@@ -14,10 +15,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.knowm.xchange.poloniex.dto.account.PoloniexAccountBalance;
 import org.knowm.xchange.poloniex.dto.account.PoloniexBalance;
 import org.knowm.xchange.poloniex.dto.account.PoloniexLoan;
 import org.knowm.xchange.poloniex.dto.account.WithdrawalResponse;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexDepositsWithdrawalsResponse;
+import org.knowm.xchange.poloniex.dto.trade.PoloniexLoanCancelResponse;
+import org.knowm.xchange.poloniex.dto.trade.PoloniexLoanCreationResponse;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexMoveResponse;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexOpenOrder;
 import org.knowm.xchange.poloniex.dto.trade.PoloniexTradeResponse;
@@ -42,17 +46,21 @@ public interface PoloniexAuthenticated {
   @POST
   @FormParam("command")
   HashMap<String, PoloniexLoan[]> returnActiveLoans(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,
-      @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
+                                                        @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
 
   @POST
   @FormParam("command")
   HashMap<String, PoloniexLoan[]> returnOpenLoanOffers(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,
-      @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
+                                                         @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
 
   @POST
   @FormParam("command")
   HashMap<String, String> returnDepositAddresses(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,
-      @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
+                                                 @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
+  @POST
+  @FormParam("command")
+  HashMap<String, String> generateNewAddress(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,
+                                                 @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
 
   @POST
   @FormParam("command")
@@ -62,7 +70,18 @@ public interface PoloniexAuthenticated {
   @POST
   @FormParam("command")
   Map<String, PoloniexOpenOrder[]> returnOrderTrades(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,
-      @FormParam("nonce") SynchronizedValueFactory<Long> nonce, @FormParam("orderNumber") String orderID) throws PoloniexException, IOException;
+                                                     @FormParam("nonce") SynchronizedValueFactory<Long> nonce, @FormParam("orderNumber") String orderID) throws PoloniexException, IOException;
+
+  @POST
+  @FormParam("command")
+  HashMap<String, HashMap<String,BigDecimal>> returnAvailableAccountBalances(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,
+                                                                             @FormParam("nonce") SynchronizedValueFactory<Long> nonce) throws PoloniexException, IOException;
+
+  @POST
+  @FormParam("command")
+  HashMap<String, String> transferBalance(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,  @FormParam("nonce") SynchronizedValueFactory<Long> nonce,
+      @FormParam("currency") String currency, @FormParam("amount") String amount, @FormParam("fromAccount") String fromAccount, @FormParam("toAccount") String toAccount) throws PoloniexException, IOException;
+
 
   @POST
   @FormParam("command")
@@ -117,6 +136,16 @@ public interface PoloniexAuthenticated {
   @FormParam("command")
   HashMap<String, String> cancelOrder(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature,
       @FormParam("nonce") SynchronizedValueFactory<Long> nonce, @FormParam("orderNumber") String orderNumber) throws PoloniexException, IOException;
+
+  @POST
+  @FormParam("command")
+  PoloniexLoanCreationResponse createLoanOffer(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature, @FormParam("nonce") SynchronizedValueFactory<Long> nonce,
+                                               @FormParam("currency") String currency, @FormParam("amount") String amount, @FormParam("duration") String duration, @FormParam("autoRenew") String autorenew, @FormParam("lendingRate") String lendingRate) throws PoloniexException, IOException;
+
+  @POST
+  @FormParam("command")
+  PoloniexLoanCancelResponse cancelLoanOffer(@HeaderParam("Key") String apiKey, @HeaderParam("Sign") ParamsDigest signature, @FormParam("nonce") SynchronizedValueFactory<Long> nonce,
+                                             @FormParam("orderNumber") String orderNumber) throws PoloniexException, IOException;
 
   @POST
   @FormParam("command")
